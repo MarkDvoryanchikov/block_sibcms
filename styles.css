@@ -103,3 +103,7 @@
 #block_sibcms div.block_sibcms_feedback {
     margin-top: 10px;
 }
+
+#block_sibcms div.form-control-static {
+    width: 100% !important;
+}
