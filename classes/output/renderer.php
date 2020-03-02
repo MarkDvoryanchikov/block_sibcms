@@ -282,6 +282,10 @@ class renderer extends \plugin_renderer_base
         return $result;
     }
 
+    public function display_teacher_report($teacher_id) {
+        return "answ";
+    }
+
     public function display_monitoring_report($course_id, $category_id) {
         global $PAGE, $OUTPUT, $CFG;
 
