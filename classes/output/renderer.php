@@ -283,7 +283,111 @@ class renderer extends \plugin_renderer_base
     }
 
     public function display_teacher_report($teacher_id) {
-        return "answ";
+        global $PAGE, $OUTPUT, $CFG, $DB, $USER;
+        $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
+        $teacher = $DB->get_record('user', array('id' => $teacher_id));
+        $result .= \html_writer::div($teacher->lastname.' '. $teacher->firstname, 'teacher_fullname');
+
+        $courses = enrol_get_users_courses($teacher_id, true, null, null);
+
+
+
+        $table = new \html_table();
+        $table->attributes['class'] = 'table block_sibcms_monitoringtable';
+        $table->head = array(
+            get_string('key27', 'block_sibcms'),
+            get_string('key28', 'block_sibcms'),
+            get_string('key29', 'block_sibcms'),
+            ''
+        );
+        $table->size = array('40%', '30%', '30%', '25px');
+
+        foreach ($courses as $course) {
+            if (!$course->visible) continue;
+
+            $ignore = sibcms_api::get_course_ignore($course->id);
+            if (!$monitoring && $ignore) continue;
+
+            $context = \context_course::instance($course->id);
+            // $role->id = 3 - editingteacher
+            if (user_has_role_assignment($teacher_id, 3, $context->id) != true) continue;
+            
+            $cells = array();
+            $course_data = sibcms_api::get_course_data($course);
+
+            $content = $OUTPUT->pix_icon('i/course', null, '', array('class' => 'icon')) . $course_data->fullname;
+            if (has_capability('moodle/course:view', $context) || is_enrolled($context)) {
+                $courseurl = "$CFG->wwwroot/course/view.php?id=$course_data->id";
+                $content = \html_writer::link($courseurl, $content);
+            }
+            $content = $OUTPUT->heading($content, 4, 'block_sibcms_coursename');
+            $cells[] = new \html_table_cell($content);
+
+            $content = '';
+            $graders = $course_data->graders;
+            if (count($graders) > 0) {
+                foreach ($graders as $grader) {
+                    $userurl = "$CFG->wwwroot/user/view.php?id=$grader->id&course=$course_data->id";
+                    $content .= \html_writer::link($userurl, fullname($grader)) . '&nbsp;';
+                    $content .= $grader->lastcourseaccess ? '(' . format_time(time() - $grader->lastcourseaccess) . ')' : '(' . get_string('never') . ')';
+                    $content .= '<br />';
+                }
+            } else $content = get_string('key50', 'block_sibcms');
+            $cells[] = new \html_table_cell($content);
+            
+            $notices = array();
+            $class = 'block_sibcms_lightgray';
+            $feedback = sibcms_api::get_last_course_feedback($course_data->id);
+            if ($feedback) {
+                if (trim($feedback->feedback) != '') {
+                    $comment = $feedback->feedback . '<br />';
+                    $comment .= \html_writer::tag('i', get_string('key77', 'block_sibcms') . ':&nbsp;' . 
+                        userdate($feedback->timecreated, '%d %b %Y, %H:%M'));
+                    $notices[] = $comment;
+                }
+                $class = $feedback->result == 0 ? 'block_sibcms_lightgreen' : 'block_sibcms_lightred';
+            } else {
+                $notices[] = get_string('key76', 'block_sibcms');
+            }
+            $content = format_float($course_data->result * 100, 2, true, true) . '%';
+            $content = get_string('key65', 'block_sibcms', $content);
+
+            $notices[] = \html_writer::tag('b', $content);
+            if (is_siteadmin()) {
+                $returnurl = '/course/view.php?id='.$course->id.'&category='.\coursecat::get($course->category)->id;
+                $content = \html_writer::link('course.php?id='. $course->id. '&category='.
+                \coursecat::get($course->category)->id.'&returnurl='.$returnurl, 'Оценить');
+                $notices[] = $content;
+            } 
+            $cells[] = \html_writer::alist($notices);
+
+            $hints = sibcms_api::get_hints($course_data);
+            $content = (count($hints) > 0 || (count($course_data->assigns) > 0) || count($course_data->quiz) > 0) ? // true
+                \html_writer::div('', 'block_sibcms_showmore') : '';
+
+            $cells[] = new \html_table_cell($content);
+
+            $row = new \html_table_row($cells);
+            if ($ignore) {
+                $class .= ' dimmed_text';
+            }
+            $row->attributes['class'] = $class;
+            $row->id = 'block_sibcms_' . $course_data->id;
+            $table->data[] = $row;
+            $cell = new \html_table_cell($content);
+            $cell->attributes['class'] = 'block_sibcms_coursestats';
+            $cell->colspan = 4;
+
+
+
+            $table->data[] = new \html_table_row(array($cell));
+
+        }
+        $result .= \html_writer::table($table);
+
+        $result .= \html_writer::end_div();
+
+        return $result;
     }
 
     public function display_monitoring_report($course_id, $category_id) {

@@ -123,4 +123,4 @@ $string['key108'] = 'Plagiarism plugin enabled';
 $string['key109'] = 'Founded errors'; //CHECK
 $string['key110'] = 'Course content changed';
 $string['key111'] = 'Teachers has graded assigns';
-$string['key112'] = 'My courses';
+$string['key112'] = 'Teacher courses';
