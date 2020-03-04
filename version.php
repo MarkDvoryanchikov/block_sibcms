@@ -24,8 +24,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2017121822;
-$plugin->maturity  = MATURITY_STABLE;
+$plugin->version = 2020030200;
 $plugin->requires  = 2016052301;
+$plugin->supported = [32, 39];
 $plugin->component = 'block_sibcms';
-$plugin->release = 'v1.0';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release = 'v1.1';
