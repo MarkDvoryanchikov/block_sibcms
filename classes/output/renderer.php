@@ -319,7 +319,7 @@ class renderer extends \plugin_renderer_base
             get_string('key29', 'block_sibcms')
         );
         $table->size = array('40%', '30%', '30%', '25px');
-
+        $print_course_number= 0;
         foreach ($courses as $course) {
             if (!$course->visible) continue;
 
@@ -330,13 +330,15 @@ class renderer extends \plugin_renderer_base
             // $role->id = 3 - editingteacher
             if (user_has_role_assignment($teacher_id, 3, $context->id) != true) continue;
             
+
             $cells = array();
             $course_data = sibcms_api::get_course_data($course);
 
+            $print_course_number++;
             $content = $OUTPUT->pix_icon('i/course', null, '', array('class' => 'icon')) . $course_data->fullname;
             if (has_capability('moodle/course:view', $context) || is_enrolled($context)) {
                 $courseurl = "$CFG->wwwroot/course/view.php?id=$course_data->id";
-                $content = \html_writer::link($courseurl, $content);
+                $content = \html_writer::tag('span', $print_course_number.'. ', array('class' => 'course_number')).\html_writer::link($courseurl, $content);
             }
             $content = $OUTPUT->heading($content, 4, 'block_sibcms_coursename');
             $cells[] = new \html_table_cell($content);
