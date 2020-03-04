@@ -762,5 +762,18 @@ class sibcms_api
         global $DB;
         $DB->delete_records('block_sibcms_ignore_courses', array('courseid' => $course_id));
     }
-
+    
+    // get all teachers (group with name 445)
+    function get_all_teachers() {
+        global $DB;
+        
+        $query = 'SELECT u.id AS id, u.username AS login, u.firstname AS firstname, u.lastname AS lastname, u.suspended
+        FROM {user} u
+        INNER JOIN {cohort_members} cm ON cm.userid = u.id
+        INNER JOIN {cohort} c ON cm.cohortid = c.id
+            WHERE u.deleted = 0 AND c.id = 445';
+        $query .= ' ORDER BY u.lastname';
+        $users = $DB->get_records_sql($query, array($teacher));
+        return $users;
+    }
 }
