@@ -18,7 +18,7 @@
  * block_sibcms
  *
  * @package    block_sibcms
- * @copyright  2017 Sergey Shlyanin <sergei.shlyanin@gmail.com>, Aleksandr Raetskiy <ksenon3@mail.ru>
+ * @copyright  2020 Mark Dvoryanchikov <kicksflips@gmail.com>, Sergey Shlyanin <sergei.shlyanin@gmail.com>, Aleksandr Raetskiy <ksenon3@mail.ru>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -283,7 +283,7 @@ class renderer extends \plugin_renderer_base
     }
 
     public function display_teacher_report($teacher_id) {
-        global $PAGE, $OUTPUT, $DB, $USER;
+        global $PAGE, $OUTPUT, $CFG, $DB, $USER;
         $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
 
         if (is_siteadmin()) {
