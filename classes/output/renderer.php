@@ -283,7 +283,7 @@ class renderer extends \plugin_renderer_base
     }
 
     public function display_teacher_report($teacher_id) {
-        global $PAGE, $OUTPUT, $DB, $USER;
+        global $PAGE, $OUTPUT, $CFG, $DB, $USER;
         $result = \html_writer::start_div('', array('id' => 'block_sibcms'));
 
         if (is_siteadmin()) {
